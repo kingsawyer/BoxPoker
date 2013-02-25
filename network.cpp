@@ -10,8 +10,8 @@ Network::Network(MainWindow* ownerWindow)
 {
     m_owner = ownerWindow;
     connect(&m_QTAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinish(QNetworkReply*)));
-
 }
+
 void Network::replyFinish(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
@@ -49,6 +49,7 @@ void Network::replyFinish(QNetworkReply *reply)
         ParseNewMoneyFileReply(reply);
     delete reply;
 }
+
 void Network::SaveFile(QNetworkReply* reply)
 {
     QFile download_file(m_current_download_destination);
@@ -96,6 +97,7 @@ void Network::ParseJackpotReply(QNetworkReply* reply)
     SaveFile(reply);
     m_owner->JackpotFileDownloaded();
 }
+
 void Network::ParseNewMoneyFileReply(QNetworkReply* reply)
 {
     QString money_file_id;
@@ -109,6 +111,7 @@ void Network::ParseNewMoneyFileReply(QNetworkReply* reply)
     }
     m_owner->ReportMoneyFileID(money_file_id);
 }
+
 void Network::ParseGetMoneyReply(QNetworkReply* reply)
 {
     SaveFile(reply);
@@ -138,6 +141,7 @@ void Network::ParseTableInfo(QNetworkReply* reply)
     }
     m_owner->SetTableInfo(jackpot_id, jackpot_etag, moneyfile_id);
 }
+
 void Network::ParseLoginReply(QNetworkReply* reply)
 {
     QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll());
@@ -153,7 +157,6 @@ QNetworkReply* Network::GetRequest(QUrl url)
     Request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     AddAccessToken(&Request);
     return m_QTAccessManager.get(Request);
-
 }
 
 void Network::PostLoginRequest(const QNetworkRequest& request, const QByteArray& data)

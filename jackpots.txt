@@ -1,0 +1,6 @@
+1000,computer1
+500,computer2
+250,computer2
+100,computer3
+50,computer3
+5,computer4

@@ -120,6 +120,7 @@ private:
     QString m_accessToken;
     QString m_refreshToken;
     QTime m_refreshTime;
+    QTime m_refresh_limit_Time; // At this time we will no longer refresh tokens
 
     QString m_tableFolder_id; //box_id of folder
     QString m_jackpot_id; //box_id

@@ -14,7 +14,6 @@ class OAuth2 : public QObject
 public:
     OAuth2(QWidget* parent, Network* network);
     QString accessToken();
-    bool isAuthorized();
     void startLogin(bool bForce);
 
     //Functions to set application's details.
@@ -28,7 +27,6 @@ public:
     void LoginUrlChanged(const QUrl& url);
 
     QString loginUrl();
-    QString AccessUrl();
 
 
 private:

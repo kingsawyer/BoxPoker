@@ -82,6 +82,8 @@ void MainWindow::SetTokens(QString accessToken, QString refreshToken, int expire
     // auto-refresh their accessToken
     m_refreshTime = QTime::currentTime();
     m_refreshTime.addSecs(expires_in >= 3600 ? 1800 : expires_in / 2);
+    m_refresh_limit_Time = QTime::currentTime();
+    m_refresh_limit_Time.addSecs(3600);
     m_network.GetUserID();
 }
 
@@ -446,7 +448,7 @@ void MainWindow::on_action_clicked()
         goto_State(Start);
         break;
     }
-    if (QTime::currentTime() > m_refreshTime) {
+    if (QTime::currentTime() > m_refreshTime && QTime::currentTime() <= m_refresh_limit_Time) {
         OAuth2 auth(this, &m_network);
         auth.GetTokensFromRefreshToken(m_refreshToken);
     }

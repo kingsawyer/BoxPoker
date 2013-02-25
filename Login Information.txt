@@ -1,0 +1,23 @@
+Login Intro
+-----------
+BoxPoker uses OAuth2 to authenticate the user. The first step for you is getting an API key for your application and a client secret. You could copy the code in BoxPoker (the secret is right in there), but then your application will be called "Box Poker" and your icon will be an ace of spades.
+
+Creating your application
+-------------------------
+Go to Box and click on the "Get API Key" button in the developer section to create an application or at least the registration for an application. You don't need to worry getting all the details right because you can change them later. Plug in those values for your application. You can choose the rights you want your application to have. You can get complete rights to everything, or nothing at all. Since an app with no rights isn't very useful you'll want to check the box for all rights.
+
+OAuth2 Basics
+-------------
+There's plenty of nice articles on OAuth2 and lots of variations in the detail of how different providers implement it. Apparently, OAuth2 is more of a guideline to authentication with a spectrum of compliance with vendors such as Google and Box hewing closely to the guidelines while on the other end of the scale are, well other vendors who are pretty loose with it. If you are writing OAuth2 for a vendor other than Box, you'll have to tweak the code to fit their model.
+
+With Box, we set up a WebView for the login screen with our client id and let Box take over from there. Box puts up the login screen with our registered application and icon and if the user authenticates and gives permission we'll get a code.
+
+The code is delivered in by redirecting the browser to a "page" where the code is part of the page. Because this page doesn't really exist we hide the WebView when we get the redirect. If you don't you'll get an ugly 404-not found page displayed to the user.
+
+Once you've got the code you have 30 seconds to make another request with that code to get access and refresh tokens. Look at the routine LoginUrlChanged in BoxOAuth2.cpp and you'll see when we get redirected to a page with a code in the query part of the URL we grab the code and then we can dismiss the dialog since there will be no more login interaction with the user.
+
+Now we quickly make a request to get access and refresh tokens. The access token is what we use with all our future Box API calls. It gives us *access*. However, it is only good for a relatively short period of time. On Box it is good for one hour. Before that hour is up, you want to use the refresh token to get a new access and refresh token. Refresh tokens are good for 14 days, so you can store this IN SECURE STORAGE for features like "remember me." Although it's tempting to just set a timer and refresh regularly, it is not good practice to just automatically refresh and stay logged in forever. Box Poker watches the "Bet!" button and if it hasn't been hit in a while it lets the access token expire. If the user is still playing, it refreshes the tokens. Now when we leave the library late at night and forget to logout we don't have to worry about someone else betting all our money the next morning. Phew!
+
+
+
+

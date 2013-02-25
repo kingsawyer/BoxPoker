@@ -24,8 +24,6 @@ OAuth2::OAuth2(QWidget* parent, Network* network) : m_network(network)
 
     m_pLoginDialog = new LoginDialog(parent, this);
     m_pParent = parent;
-    //QMetaObject::Connection result = connect(m_pLoginDialog, &LoginDialog::urlChanged, this, &OAuth2::LoginUrlChanged, Qt::DirectConnection);
-    //qDebug() << "connected " << (bool)result;
 }
 
 void OAuth2::setScope(const QString& scope)
@@ -53,48 +51,31 @@ void OAuth2::setAppName(const QString& appName)
     m_strAppName = appName;
 }
 
-
-
 QString OAuth2::loginUrl()
 {
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("client_id", m_strClientID);
     urlQuery.addQueryItem("response_type", m_strResponseType);
 
-    //optional scope parameter
-    //urlQuery.addQueryItem("scope", m_strScope);
-
     QString str = QString("%1?%2").arg(m_codeRequestURL).arg(urlQuery.query(QUrl::FullyEncoded));
-    //supposedly optional if you have registered redirectURL at Box
+    // optional if you have registered redirectURL at Box
     str += QString("&redirect_uri=%1").arg(QString(QUrl::toPercentEncoding(m_strRedirectURI)));
     qDebug() << "Login URL" << str;
-    return str;
-}
-QString OAuth2::AccessUrl()
-{
-    QUrlQuery urlQuery;
-    urlQuery.addQueryItem("grant_type", "authorization_code");
-    urlQuery.addQueryItem("code", m_code);
-    //optional if you have registered redirectURL at Box
-    //urlQuery.addQueryItem("redirect_uri", QUrl::toPercentEncoding(m_strRedirectURI));
-    urlQuery.addQueryItem("client_id", m_strClientID);
-    urlQuery.addQueryItem("client_secret", m_clientSecret);
-    QString str = QString("%1?%2").arg(m_AccessRequestURL).arg(urlQuery.query());
-    qDebug() << "Access URL" << str;
     return str;
 }
 
 void OAuth2::LoginUrlChanged(const QUrl& url)
 {
     qDebug() << "LoginUrlChanged in OAUTH login =" << url;
-    //QString str = url.toString();
-    //QUrl temp= QUrl(url);
     QUrlQuery query(url);
 
+    // Not on Box, but other OAuth vendors may do this. Wow, got access right away.
     if (query.hasQueryItem("access_token")) {
         m_strAccessToken = query.queryItemValue("access_token");
         m_pLoginDialog->accept();
     }
+
+    // Expected. Got a code good for 30 seconds.
     if (query.hasQueryItem("code")) {
         //QSettings settings(m_strCompanyName, m_strAppName);
         m_code = query.queryItemValue("code");
@@ -102,6 +83,7 @@ void OAuth2::LoginUrlChanged(const QUrl& url)
         m_pLoginDialog->accept();
     }
 }
+
 void OAuth2::GetTokensFromCode()
 {
     QNetworkRequest request(m_AccessRequestURL);
@@ -123,8 +105,8 @@ void OAuth2::GetTokensFromRefreshToken(QString refresh_token)
     QNetworkRequest request(m_AccessRequestURL);
 
     QUrlQuery urlQuery;
-    urlQuery.addQueryItem("grant_type", "token");
-    urlQuery.addQueryItem("token", refresh_token);
+    urlQuery.addQueryItem("grant_type", "refresh_token");
+    urlQuery.addQueryItem("refresh_token", refresh_token);
     urlQuery.addQueryItem("client_id", m_strClientID);
     urlQuery.addQueryItem("client_secret", m_clientSecret);
     QByteArray postData;
@@ -137,11 +119,6 @@ void OAuth2::GetTokensFromRefreshToken(QString refresh_token)
 QString OAuth2::accessToken()
 {
     return m_strAccessToken;
-}
-
-bool OAuth2::isAuthorized()
-{
-    return m_strAccessToken != "";
 }
 
 void OAuth2::startLogin(bool bForce)
