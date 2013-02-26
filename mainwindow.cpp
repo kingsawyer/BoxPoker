@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->account->hide();
     ui->action->hide();
     ui->celebrate_pic->hide();
+    bet = 10;
 
     m_player = new QMediaPlayer();
     m_player->setVolume(100);
@@ -352,7 +353,7 @@ void MainWindow::goto_State(GameState state)
     case Bankrupt:
         DisplayHand();
         ui->instructions->setText("You ran out of money.\nYou must admit you are a loser,\nbut then you'll get another $1000");
-        ui->action->setText("I'm a loser. Help me.");
+        ui->action->setText("I'm a loser.\r\nHelp me.");
         break;
     }
 }
@@ -373,7 +374,7 @@ void MainWindow::Evaluate()
     QString deb = QString("%1 + ").arg(hand[0]) +QString("%1+").arg(hand[1])+QString("%1+").arg(hand[2]) + QString("%1+").arg(hand[3])+ QString("%1+").arg(hand[4]);
     //ui->debug->setText(deb);
     HandRank rank = EvaluateHand(hand);
-    //rank = eTwoPair; //!
+    //rank = eTwoPair; //! uncomment to test wins. You cheater.
     if (rank > eBust)
         ui->last_win->setText(QString("last win was: ") + QString(RankToText(rank)));
     int payout = bet * BasePayout(rank);
@@ -388,7 +389,7 @@ void MainWindow::Evaluate()
     else {
         if (rank == ePair)
             DoCelebrate(Small);
-        else {
+        else if (rank > ePair){
             DoCelebrate(Medium);
         }
         if (payout > 0) {
@@ -559,8 +560,9 @@ void MainWindow::WriteMoneyFile()
                                  .arg(moneyFileName()).arg(moneyFile.errorString()));
     }
     else {
-        QString moneyline = QString("%1\r\n").arg(money);
+        QString moneyline = QString("%1").arg(money);
         moneyFile.write(moneyline.toLatin1());
+        moneyFile.write("\r\n");
         moneyFile.write(GetHash(m_user_id, moneyline).toLatin1());
         moneyFile.flush();
         moneyFile.close();
