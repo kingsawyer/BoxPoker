@@ -12,8 +12,8 @@ OAuth2::OAuth2(QWidget* parent, Network* network) : m_network(network)
     m_codeRequestURL = "https://api.box.com/oauth2/authorize";
     m_AccessRequestURL = "https://api.box.com/oauth2/token";
     m_strScope = "";
-    m_strClientID = "fnqtaemvpity6abkov5kmw3z7lwbuftc";  // insert your client ID
-    m_clientSecret = "VCYd1Zo6gr1FRrd07jhhgaCP3O1YJqjN"; // insert your client secret
+    m_strClientID = "s3y3n049rxybhtv2t18xv1lnezk8pq6y";  // insert your client ID
+    m_clientSecret = "Z3s5WDhtZrS1tJspU9ZjxyeeyIeymvfq"; // insert your client secret
     m_strRedirectURI = "https://www.box.com/poker"; // insert a dummy URI here
     m_strResponseType = "code";
     m_code = "";

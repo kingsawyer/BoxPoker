@@ -5,6 +5,12 @@ Sample C++ application using the Box API and Qt 5.0. This was my 2013 Hackathon 
 
 BoxPoker is a video poker slot machine. It uses Box to store and share progressive jackpots for the high scoring hands.
 
+Download
+========
+Windows
+  https://cloud.box.com/boxvideopoker
+  Grab the whole folder and launch using the .exe within it
+
 Setup of the game
 ==================
 When the game launches, click the "login" button to login to Box. The application uses OAuth2 to authenticate you and connect you to your account.
