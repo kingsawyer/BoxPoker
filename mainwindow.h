@@ -36,10 +36,10 @@ public:
     void ReportMoneyFileID(QString money_file_id);
     void ReportMoneyFileDownloaded();
     QString moneyFileName();
-    void SetTableInfo(QString jackpot_id, QString jackpot_etag, QString moneyfile_id);
-    void SetTokens(QString m_accessToken, QString m_refreshToken, int expires_in);
-    void SetUserID(QString user_id, QString username);
-    void JackpotFileDownloaded();
+    void ReportTableInfo(QString jackpot_id, QString jackpot_etag, QString moneyfile_id);
+    void ReportTokens(QString m_accessToken, QString m_refreshToken, int expires_in);
+    void ReportUserInformation(QString user_id, QString username);
+    void ReportJackpotFileDownloaded();
 
 private slots:
     void on_tableName_returnPressed();

@@ -11,6 +11,9 @@
 #include "BoxOAuth2.h"
 
 static const int kMaxBet = 100;
+static const QString kAppName = "Box Video Poker";
+
+// Initializer for main window
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), m_network(this),
     ui(new Ui::MainWindow)
@@ -30,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->account->hide();
     ui->action->hide();
     ui->celebrate_pic->hide();
+    ui->tester->hide();
     bet = 10;
 
     m_player = new QMediaPlayer();
@@ -65,6 +69,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Plays a sound located in the same directory as the application
+// The media player does not support embedding sounds as resources
 void MainWindow::PlaySound(QString sound)
 {
     QString appdir_path = QCoreApplication::applicationDirPath();
@@ -74,20 +80,25 @@ void MainWindow::PlaySound(QString sound)
     m_player->play();
 }
 
-void MainWindow::SetTokens(QString accessToken, QString refreshToken, int expires_in)
+// New access and refresh tokens obtained. Replace old tokens
+void MainWindow::ReportTokens(QString accessToken, QString refreshToken, int expires_in)
 {
-    m_network.SetTokens(accessToken);
+    m_network.SetAccessToken(accessToken);
     m_accessToken = accessToken;
     m_refreshToken = refreshToken;
     // if user is active within 30 minutes of expiration or half of token time (whichever is less)
     // auto-refresh their accessToken
+    // after refreshTime we'll refresh tokens
     m_refreshTime = QTime::currentTime();
     m_refreshTime.addSecs(expires_in >= 3600 ? 1800 : expires_in / 2);
+    // if idle at refresh_limit_time, we'll let access token expire
     m_refresh_limit_Time = QTime::currentTime();
     m_refresh_limit_Time.addSecs(3600);
-    m_network.GetUserID();
+    // Get user number and user name
+    m_network.GetUserInformation();
 }
 
+// Attempt to upload the jackpot file
 void MainWindow::UploadJackpotsFile()
 {
     QString jackpotfileName = m_localFolder + "/jackpots.txt";
@@ -113,7 +124,6 @@ void MainWindow::SetupMoney()
         goto_State(Start);
     }
 }
-
 
 bool MainWindow::UpdateJackpots()
 {
@@ -240,7 +250,8 @@ void MainWindow::on_tableName_returnPressed()
 {
     m_tableFolder_id = ui->tableName->text();
     m_jackpot_id = "";
-    m_network.FindTableFiles(m_tableFolder_id);
+    if (m_tableFolder_id != "")
+        m_network.FindTableFiles(m_tableFolder_id);
 }
 
 void MainWindow::DrawHand()
@@ -264,6 +275,7 @@ void MainWindow::DrawHand()
     PlaySound("slide5.mp3");
     m_anim_group.start();
 }
+
 void MainWindow::ReplenishHand()
 {
     bool found;
@@ -287,6 +299,7 @@ void MainWindow::ReplenishHand()
     PlaySound(QString("slide%1.mp3").arg(m_anim_group.animationCount()));
     m_anim_group.start();
 }
+
 void MainWindow::_on_animation_finished()
 {
     if (m_gamestate == Refilling) {
@@ -415,7 +428,7 @@ bool MainWindow::UserGoofed()
         if (hand[i] == NOCARD)
             return false;
     if (EvaluateHand(hand) < eStraight) {
-        QMessageBox msgBox(QMessageBox::Question, "Box Draw Poker",
+        QMessageBox msgBox(QMessageBox::Question, kAppName,
                            "Are you sure you don't want to discard some cards and try for a better hand?",
                            QMessageBox::Yes | QMessageBox::No, this);
         msgBox.setDefaultButton(QMessageBox::No);
@@ -594,7 +607,7 @@ void MainWindow::EndOfHand()
         goto_State(Bankrupt);
 }
 
-void MainWindow::SetUserID(QString user_id, QString username)
+void MainWindow::ReportUserInformation(QString user_id, QString username)
 {
     m_user_id = user_id;
     m_username = username;
@@ -607,7 +620,8 @@ void MainWindow::ReportEtagMismatch()
 {
     // we only use etag matching for jackpot file
     // re-get the ids and etags for our files
-    m_network.FindTableFiles(m_tableFolder_id);
+    if (m_tableFolder_id != "")
+        m_network.FindTableFiles(m_tableFolder_id);
 }
 
 void MainWindow::ReportNetworkError(QString message)
@@ -615,16 +629,24 @@ void MainWindow::ReportNetworkError(QString message)
     ui->instructions->setText(message);
 }
 
-void MainWindow::SetTableInfo(QString jackpot_id, QString jackpot_etag, QString moneyfile_id)
+void MainWindow::ReportTableInfo(QString jackpot_id, QString jackpot_etag, QString moneyfile_id)
 {
-    m_jackpot_id = jackpot_id;
-    m_jackpot_etag = jackpot_etag;
-    m_money_file_id = moneyfile_id;
-    m_network.DownloadJackpots(m_jackpot_id, m_localFolder + "/jackpots.txt");
-    ui->tableName->setEnabled(false);
-    ui->table_instructions->hide();
-    ui->account->show();
-    ui->action->show();
+    if (jackpot_id != "") {
+        m_jackpot_id = jackpot_id;
+        m_jackpot_etag = jackpot_etag;
+        m_money_file_id = moneyfile_id;
+        m_network.DownloadJackpots(m_jackpot_id, m_localFolder + "/jackpots.txt");
+        ui->tableName->setEnabled(false);
+        ui->table_instructions->hide();
+        ui->account->show();
+        ui->action->show();
+    }
+    else {
+        QMessageBox msgBox(this);
+        msgBox.setText("That does not appear to be a valid table.");
+        msgBox.exec();
+    }
+
 }
 
 QString MainWindow::moneyFileName()
@@ -639,12 +661,14 @@ QString MainWindow::GetMoneyFilename()
     return QString(m_localFolder + "/" + moneyFileName());
 }
 
-void MainWindow::JackpotFileDownloaded()
+void MainWindow::ReportJackpotFileDownloaded()
 {
     if (!UpdateJackpots()) {
         QMessageBox msgBox(this);
-        msgBox.setText("That does not appear to be a valid table.");
+        msgBox.setText("That does not appear to be a valid table. Jackpots file is invalid.");
         msgBox.exec();
+        ui->tableName->setEnabled(true);
+        ui->table_instructions->show();
         return;
     }
     if (m_gamestate == Login) {
@@ -664,7 +688,7 @@ void MainWindow::ReportMoneyFileDownloaded()
 void MainWindow::on_LoginButton_clicked()
 {
     OAuth2 login(this, &m_network);
-    login.startLogin(false);
+    login.startLogin();
     return;
 }
 void MainWindow::DoCelebrate(Celebrate amount)

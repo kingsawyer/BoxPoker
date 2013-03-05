@@ -25,9 +25,6 @@ signals:
 
 public slots:
     void viewUrlChanged(const QUrl& url);
-    void loadStarted();
-    void loadFinished(bool);
-
 
 private:
     Ui::LoginDialog *ui;

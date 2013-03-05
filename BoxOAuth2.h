@@ -14,13 +14,13 @@ class OAuth2 : public QObject
 public:
     OAuth2(QWidget* parent, Network* network);
     QString accessToken();
-    void startLogin(bool bForce);
+    void startLogin();
 
     //Functions to set application's details.
     void setScope(const QString& scope);
     void setClientID(const QString& clientID);
     void setRedirectURI(const QString& redirectURI);
-    void setCompanyName(const QString& companyName);
+    //?void setCompanyName(const QString& companyName);
     void setAppName(const QString& appName);
     void GetTokensFromRefreshToken(QString refresh_token);
 

@@ -12,8 +12,8 @@ class Network : public QObject
     Q_OBJECT
 public:
     Network(MainWindow* ownerWindow);
-    void SetTokens(QString access) {m_BoxAccessToken = access; }
-    void GetUserID();
+    void SetAccessToken(QString access) {m_BoxAccessToken = access; }
+    void GetUserInformation();
     void FindTableFiles(QString tableName);
     void PostLoginRequest(const QNetworkRequest& request, const QByteArray& data);
     void UploadJackpots(QString filename, QString file_id, QString etag);

@@ -1,7 +1,7 @@
 #include "BoxOAuth2.h"
 #include <QDebug>
 #include <QApplication>
-#include <QSettings>
+//?#include <QSettings>
 #include <QMessageBox>
 #include <QUrlQuery>
 #include "logindialog.h"
@@ -19,8 +19,8 @@ OAuth2::OAuth2(QWidget* parent, Network* network) : m_network(network)
     m_code = "";
     m_strAccessToken = "";
 
-    m_strCompanyName = "Box";
-    m_strAppName = "Box Video Poker Slot Machine";
+    //?m_strCompanyName = "Box"; //?
+    m_strAppName = "Box Video Poker Slot Machine"; //?
 
     m_pLoginDialog = new LoginDialog(parent, this);
     m_pParent = parent;
@@ -41,10 +41,10 @@ void OAuth2::setRedirectURI(const QString& redirectURI)
     m_strRedirectURI = redirectURI;
 }
 
-void OAuth2::setCompanyName(const QString& companyName)
-{
-    m_strCompanyName = companyName;
-}
+//?void OAuth2::setCompanyName(const QString& companyName)
+//?{
+    //?m_strCompanyName = companyName;
+//?}
 
 void OAuth2::setAppName(const QString& appName)
 {
@@ -77,9 +77,7 @@ void OAuth2::LoginUrlChanged(const QUrl& url)
 
     // Expected. Got a code good for 30 seconds.
     if (query.hasQueryItem("code")) {
-        //QSettings settings(m_strCompanyName, m_strAppName);
         m_code = query.queryItemValue("code");
-        //settings.setValue("code", m_code);
         m_pLoginDialog->accept();
     }
 }
@@ -121,23 +119,11 @@ QString OAuth2::accessToken()
     return m_strAccessToken;
 }
 
-void OAuth2::startLogin(bool bForce)
+void OAuth2::startLogin()
 {
-    QSettings settings(m_strCompanyName, m_strAppName);
-    QString str = settings.value("access_token", "").toString();
-
-    qDebug() << "OAuth2::startLogin, token from Settings" << str;
-
-    if(str.isEmpty() || bForce)
-    {
-        m_pLoginDialog->setLoginUrl(loginUrl());
-        m_pLoginDialog->exec();
-        GetTokensFromCode();
-    }
-    else
-    {
-        m_strAccessToken = str;
-    }
+    m_pLoginDialog->setLoginUrl(loginUrl());
+    m_pLoginDialog->exec();
+    GetTokensFromCode();
 }
 
 

@@ -12,8 +12,9 @@ QT += webkitwidgets
 QT += widgets
 QT += multimedia
 
-TARGET = BoxCasino
+TARGET = BoxVideoPoker
 TEMPLATE = app
+RC_FILE = Poker.rc
 
 
 SOURCES += main.cpp\

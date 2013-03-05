@@ -13,27 +13,11 @@ LoginDialog::LoginDialog(QWidget *parent , OAuth2 *oauth) :
 {
     ui->setupUi(this);
     connect(ui->webView, &QWebView::urlChanged, this, &LoginDialog::viewUrlChanged);
-    connect(ui->webView, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
-    connect(ui->webView, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 }
 
 LoginDialog::~LoginDialog()
 {
     delete ui;
-}
-void LoginDialog::loadStarted()
-{
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    qDebug() << "loadStarted";
-    QWebFrame* frame = ui->webView->page()->currentFrame();
-    qDebug() << "frame =" << frame->requestedUrl();
-}
-
-void LoginDialog::loadFinished(bool b)
-{
-    QApplication::restoreOverrideCursor();
-    qDebug() << "webviewURL =" << ui->webView->url();
-    qDebug() << "loadFinished with" << b;
 }
 
 void LoginDialog::viewUrlChanged(const QUrl &url)
@@ -51,5 +35,5 @@ void LoginDialog::viewUrlChanged(const QUrl &url)
 
 void LoginDialog::setLoginUrl(const QString& url)
 {
-   ui->webView->setUrl(url);
+    ui->webView->setUrl(url);
 }

@@ -58,5 +58,7 @@
         <file>celebrations/1.jpg</file>
         <file>celebrations/ukulele.jpg</file>
         <file>celebrations/giraffe.jpg</file>
+        <file>cards/AS.gif</file>
+        <file>cards/AS_small.png</file>
     </qresource>
 </RCC>

@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Box Draw Poker</string>
+   <string>Box Video Poker</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="images.qrc">
-    <normaloff>:/images/cards/2.png</normaloff>:/images/cards/2.png</iconset>
+   <iconset>
+    <normaloff>cards/AS_square.gif</normaloff>cards/AS_square.gif</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(222, 228, 255);</string>
@@ -328,6 +328,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="tester">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>280</x>
@@ -384,7 +387,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="images.qrc">
+     <iconset resource="resources.qrc">
       <normaloff>:/images/cards/Box_Back.svg</normaloff>:/images/cards/Box_Back.svg</iconset>
     </property>
     <property name="iconSize">
@@ -428,7 +431,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="images.qrc">
+     <iconset resource="resources.qrc">
       <normaloff>:/images/cards/Box_Back.svg</normaloff>:/images/cards/Box_Back.svg</iconset>
     </property>
     <property name="iconSize">
@@ -472,7 +475,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="images.qrc">
+     <iconset resource="resources.qrc">
       <normaloff>:/images/cards/Box_Back.svg</normaloff>:/images/cards/Box_Back.svg</iconset>
     </property>
     <property name="iconSize">
@@ -516,7 +519,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="images.qrc">
+     <iconset resource="resources.qrc">
       <normaloff>:/images/cards/Box_Back.svg</normaloff>:/images/cards/Box_Back.svg</iconset>
     </property>
     <property name="iconSize">
@@ -560,7 +563,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="images.qrc">
+     <iconset resource="resources.qrc">
       <normaloff>:/images/cards/Box_Back.svg</normaloff>:/images/cards/Box_Back.svg</iconset>
     </property>
     <property name="iconSize">
@@ -596,7 +599,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="images.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

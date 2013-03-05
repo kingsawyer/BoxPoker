@@ -17,7 +17,7 @@ void Network::replyFinish(QNetworkReply *reply)
     if (reply->error() != QNetworkReply::NoError) {
         int err = reply->error();
         if (err > 200 && err < 300){
-            // etag mismatch. Get latest etag and download file.
+            // etag mismatch. Get latest etag and re-download file.
             m_owner->ReportEtagMismatch();
         }
         QString message = QString("A network error occurred: %1").arg(reply->errorString());
@@ -85,17 +85,18 @@ void Network::ParseGetUser(QNetworkReply* reply)
 {
     QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll());
     QVariantMap map;
-    if (jsonDoc.isObject())
+    if (jsonDoc.isObject()) {
         map = jsonDoc.object().toVariantMap();
-    QString user_id = map["id"].toString();
-    QString user_name = map["name"].toString();
-    m_owner->SetUserID(user_id, user_name);
+        QString user_id = map["id"].toString();
+        QString user_name = map["name"].toString();
+        m_owner->ReportUserInformation(user_id, user_name);
+    }
 }
 
 void Network::ParseJackpotReply(QNetworkReply* reply)
 {
     SaveFile(reply);
-    m_owner->JackpotFileDownloaded();
+    m_owner->ReportJackpotFileDownloaded();
 }
 
 void Network::ParseNewMoneyFileReply(QNetworkReply* reply)
@@ -139,7 +140,7 @@ void Network::ParseTableInfo(QNetworkReply* reply)
         if (moneyfile_id != "" && jackpot_id != "")
             break; // we have both we can stop looping
     }
-    m_owner->SetTableInfo(jackpot_id, jackpot_etag, moneyfile_id);
+    m_owner->ReportTableInfo(jackpot_id, jackpot_etag, moneyfile_id);
 }
 
 void Network::ParseLoginReply(QNetworkReply* reply)
@@ -148,7 +149,7 @@ void Network::ParseLoginReply(QNetworkReply* reply)
     QString accessToken = jsonDoc.object().value("access_token").toString();
     QString refreshToken = jsonDoc.object().value("refresh_token").toString();
     int expires_in = jsonDoc.object().value("expires_in").toString().toUInt();
-    m_owner->SetTokens(accessToken, refreshToken, expires_in);
+    m_owner->ReportTokens(accessToken, refreshToken, expires_in);
 }
 
 QNetworkReply* Network::GetRequest(QUrl url)
@@ -182,7 +183,8 @@ QNetworkReply* Network::UploadOverExistingFile(QString filename, QString file_id
     data += "Content-Disposition: form-data; name=\"action\"\r\n\r\n";
     data += "\r\n";
     data += QString("--" + bound + "\r\n").toLatin1();
-    data += "Content-Disposition: form-data; name=\"file\"; filename=\""+finfo.baseName()+"\"\r\n";
+    // filename is required, but ignored.
+    data += "Content-Disposition: form-data; name=\"file\"; filename=\""+finfo.fileName()+"\"\r\n";
     data += "Content-Type: image/"+finfo.suffix().toLower()+"\r\n\r\n";
     QFile file(finfo.absoluteFilePath());
     file.open(QIODevice::ReadOnly);
@@ -216,7 +218,7 @@ QNetworkReply*  Network::UploadNewFile(QString filename, QString folder_id)
     data += "Content-Disposition: form-data; name=\"action\"\r\n\r\n";
     data += "\r\n";
     data += QString("--" + bound + "\r\n").toLatin1();
-    data += "Content-Disposition: form-data; name=\"file\"; filename=\""+finfo.baseName()+"\"\r\n";
+    data += "Content-Disposition: form-data; name=\"file\"; filename=\""+finfo.fileName()+"\"\r\n";
     data += "Content-Type: image/"+finfo.suffix().toLower()+"\r\n\r\n";
     QFile file(finfo.absoluteFilePath());
     file.open(QIODevice::ReadOnly);
@@ -238,7 +240,7 @@ void Network::AddAccessToken(QNetworkRequest* request)
     request->setRawHeader("Authorization", ba);
 }
 
-void Network::GetUserID()
+void Network::GetUserInformation()
 {
     QUrl url(QString("https://api.box.com/2.0/users/me"));
     m_getuser = GetRequest(url);

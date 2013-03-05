@@ -9,13 +9,14 @@ Download
 ========
 Windows
   https://cloud.box.com/boxvideopoker
+
   Grab the whole folder and launch using the .exe within it
 
 Setup of the game
 ==================
 When the game launches, click the "login" button to login to Box. The application uses OAuth2 to authenticate you and connect you to your account.
 
-Select a "table" which is really just a folder on Box that has a jackpots.txt file (there is a sample one in the repo). Use the ID of the folder which is a long number. You can also drop me an email and I'll collab you to a folder with a jackpots.txt file.
+Select a "table" which is really just a folder on Box that has a jackpots.txt file (there is a sample one in the repo). Use the ID of the folder which is a long number displayed in the URL when you browse to it in Box. You can also drop me an email and I'll collab you to a folder with a jackpots.txt file.
 
 Play
 ====
